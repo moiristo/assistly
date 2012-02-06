@@ -66,43 +66,49 @@ module Assistly
         end
       end
       
-      # Create a new customer email
-      #
-      #   @option options [String]
-      #   @example Return extended information for 12345
-      #     Assistly.create_customer_email(12345, "foo@example.com")
-      # @format :json
-      # @authenticated true
-      # @see http://dev.assistly.com/docs/api/customers/emails/create
-      def create_customer_email(id, email, *args)
-        options = args.last.is_a?(Hash) ? args.pop : {}
-        options.merge!({:email => email})
-        response = post("customers/#{id}/emails",options)
-        if response['success']
-          return response['results']['email']
-        else
-          return response
+      ['email', 'phone', 'twitter'].each do |customer_detail|
+      
+        # Create a new customer user detail (email, phone, twitter)
+        #
+        #   @option options [String]
+        #   @example Return extended information for 12345
+        #     Assistly.create_customer_email(12345, "foo@example.com")
+        #     Assistly.create_customer_phone(12345, "1234567890")
+        #     Assistly.create_customer_twitter(12345, "mytwittername")                    
+        # @format :json
+        # @authenticated true  
+        define_method "create_customer_#{customer_detail}" do |id, detail, *args|
+          options = args.last.is_a?(Hash) ? args.pop : {}
+          options.merge!({customer_detail => detail})
+
+          response = post("customers/#{id}/#{customer_detail}s", options)
+          if response['success']
+            return response['results'][customer_detail]
+          else
+            return response
+          end       
         end
+
+        # Update a customer user detail (email, phone, twitter)
+        #
+        #   @option options [String]
+        #   @example Return extended information for 12345
+        #     Assistly.update_customer_email(12345, 67890, :email => "foo@example.com", :customer_contact_type => "work")
+        #     Assistly.update_customer_phone(12345, 67891, :phone => "1234567890")    
+        #     Assistly.update_customer_twitter(12345, 67892, :twitter => "mytwittername")            
+        # @format :json
+        # @authenticated true
+        define_method "update_customer_#{customer_detail}" do |id, detail_id, *args|   
+          options = args.last.is_a?(Hash) ? args.pop : {}
+          response = put("customers/#{id}/#{customer_detail}s/#{detail_id}",options)
+          if response['success']
+            return response['results'][customer_detail]
+          else
+            return response
+          end          
+        end     
       end
       
-      # Update a customer's email
-      #
-      #   @option options [String]
-      #   @example Return extended information for 12345
-      #     Assistly.update_customer_email(12345, 12345, :email => "foo@example.com")
-      #     Assistly.update_customer_email(12345, 12345, :customer_contact_type => "work")
-      # @format :json
-      # @authenticated true
-      # @see http://dev.assistly.com/docs/api/customers/emails/update
-      def update_customer_email(id, email_id, *args)
-        options = args.last.is_a?(Hash) ? args.pop : {}
-        response = put("customers/#{id}/emails/#{email_id}",options)
-        if response['success']
-          return response['results']['email']
-        else
-          return response
-        end
-      end
     end
   end
 end
