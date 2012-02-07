@@ -66,7 +66,7 @@ module Assistly
         end
       end
       
-      ['email', 'phone', 'twitter'].each do |customer_detail|
+      ['email', 'phone', 'address'].each do |customer_detail|
       
         # Create a new customer user detail (email, phone, twitter)
         #
